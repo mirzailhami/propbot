@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XAUUSD 4h Prop Firm Compliant AI Strategy Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        .spinner { display: none; }
+        #indicatorsSection { display: block; }
+        #strategy-text { background: #f9fafb; padding: 1rem; border-radius: 0.375rem; }
+        #chat-messages { 
+            max-height: 200px; 
+            overflow-y: auto; 
+            margin-top: 1rem; 
+        }
+        #chat-input-section { 
+            position: sticky; 
+            bottom: 10px; 
+            display: flex; 
+            gap: 8px; 
+            align-items: center; 
+            background: white; 
+            padding: 10px; 
+            border-radius: 15px; 
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+        }
+        .chat-message-user { 
+            margin: 8px 0; 
+            text-align: left; 
+        }
+        .chat-message-ai { 
+            margin: 8px 0; 
+            text-align: right; 
+        }
+        .chat-bubble-user { 
+            background: #e5e7eb; 
+            padding: 10px 15px; 
+            border-radius: 15px; 
+            display: inline-block; 
+            max-width: 70%; 
+            word-wrap: break-word; 
+        }
+        .chat-bubble-ai { 
+        text-align: left;
+            background: #3b82f6; 
+            color: white; 
+            padding: 10px 15px; 
+            border-radius: 15px; 
+            display: inline-block; 
+            max-width: 70%; 
+            word-wrap: break-word; 
+        }
+        #chatBtn { 
+            padding: 0; 
+            width: 40px; 
+            height: 40px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            border-radius: 50%; 
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="container mx-auto p-6 max-w-5xl">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">XAUUSD 4h Prop Firm Compliant AI Strategy Generator</h1>
+
+        <!-- Form -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Risk Profile</label>
+                    <select id="risk" class="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="Conservative">Conservative</option>
+                        <option value="Moderate">Moderate</option>
+                        <option value="Aggressive">Aggressive</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Trading Style</label>
+                    <select id="style" class="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="Swing">Swing Trading</option>
+                        <option value="Scalping">Scalping</option>
+                        <option value="Day">Day Trading</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Time Range</label>
+                    <select id="timeRange" class="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="1m">Last 1 Month</option>
+                        <option value="3m">Last 3 Months</option>
+                        <option value="6m">Last 6 Months</option>
+                        <option value="1y">Last 1 Year</option>
+                        <option value="2y">Last 2 Years</option>
+                    </select>
+                </div>
+            </div>
+            <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="flex items-center">
+                    <input id="newsFilter" type="checkbox" checked class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                    <label for="newsFilter" class="ml-2 text-sm font-medium text-gray-700">News Filtering</label>
+                </div>
+                <div class="flex items-center">
+                    <input id="indicatorsToggle" type="checkbox" checked class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                    <label for="indicatorsToggle" class="ml-2 text-sm font-medium text-gray-700">Technical Indicators</label>
+                </div>
+            </div>
+            <div id="indicatorsSection" class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="flex items-center text-sm font-medium text-gray-700 mb-1">
+                        <input id="maCheck" type="checkbox" checked class="mr-2">
+                        MA Short (<span id="maValue">10</span>)
+                    </label>
+                    <input id="maSlider" type="range" min="10" max="100" value="10" class="w-full">
+                </div>
+                <div>
+                    <label class="flex items-center text-sm font-medium text-gray-700 mb-1">
+                        <input id="maLongCheck" type="checkbox" checked class="mr-2">
+                        MA Long (<span id="maLongValue">50</span>)
+                    </label>
+                    <input id="maLongSlider" type="range" min="50" max="300" value="50" class="w-full">
+                </div>
+                <div>
+                    <label class="flex items-center text-sm font-medium text-gray-700 mb-1">
+                        <input id="rsiCheck" type="checkbox" checked class="mr-2">
+                        RSI (<span id="rsiValue">14</span>)
+                    </label>
+                    <input id="rsiSlider" type="range" min="5" max="50" value="14" class="w-full">
+                </div>
+                <div>
+                    <label class="flex items-center text-sm font-medium text-gray-700 mb-1">
+                        <input id="atrCheck" type="checkbox" class="mr-2">
+                        ATR (<span id="atrValue">14</span>)
+                    </label>
+                    <input id="atrSlider" type="range" min="5" max="50" value="14" class="w-full">
+                </div>
+                <div>
+                    <label class="flex items-center text-sm font-medium text-gray-700 mb-1">
+                        <input id="adxCheck" type="checkbox" class="mr-2">
+                        ADX (<span id="adxValue">14</span>)
+                    </label>
+                    <input id="adxSlider" type="range" min="5" max="50" value="14" class="w-full">
+                </div>
+            </div>
+            <button id="generateBtn" onclick="generate()" class="mt-4 w-full bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700 transition flex items-center justify-center">
+                <span id="btnText">Generate Strategy</span>
+                <svg id="spinner" class="spinner animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Strategy Output with Integrated Chat -->
+        <div id="strategy" class="bg-white p-6 rounded-lg shadow-md mb-6 hidden">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Generated Strategy</h2>
+            <div id="strategy-text" class="text-gray-700"></div>
+            <div id="chat-messages"></div>
+            <div id="chat-input-section" class="hidden">
+                <input id="chatInput" type="text" placeholder="Ask me anything about the strategy..." class="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" onkeypress="if(event.key === 'Enter') chat()">
+                <button id="chatBtn" onclick="chat()" class="bg-blue-600 text-white hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStrategy = '';
+
+        ['ma', 'maLong', 'rsi', 'atr', 'adx'].forEach(id => {
+            const slider = document.getElementById(`${id}Slider`);
+            const value = document.getElementById(`${id}Value`);
+            slider.oninput = () => value.innerText = slider.value;
+        });
+
+        document.getElementById('indicatorsToggle').addEventListener('change', (e) => {
+            document.getElementById('indicatorsSection').style.display = e.target.checked ? 'block' : 'none';
+        });
+
+        async function generate() {
+            const btn = document.getElementById('generateBtn');
+            const btnText = document.getElementById('btnText');
+            const spinner = document.getElementById('spinner');
+            btn.disabled = true;
+            btnText.classList.add('hidden');
+            spinner.style.display = 'inline-block';
+
+            const risk = document.getElementById('risk').value;
+            const style = document.getElementById('style').value;
+            const timeRange = document.getElementById('timeRange').value;
+            const useNews = document.getElementById('newsFilter').checked;
+            const useIndicators = document.getElementById('indicatorsToggle').checked;
+            const indicators = {
+                'MA': { enabled: document.getElementById('maCheck').checked, period: parseInt(document.getElementById('maSlider').value) },
+                'MA_long': { enabled: document.getElementById('maLongCheck').checked, period: parseInt(document.getElementById('maLongSlider').value) },
+                'RSI': { enabled: document.getElementById('rsiCheck').checked, period: parseInt(document.getElementById('rsiSlider').value) },
+                'ATR': { enabled: document.getElementById('atrCheck').checked, period: parseInt(document.getElementById('atrSlider').value) },
+                'ADX': { enabled: document.getElementById('adxCheck').checked, period: parseInt(document.getElementById('adxSlider').value) }
+            };
+
+            try {
+                const response = await fetch('http://localhost:5000/generate_strategy', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ risk_level: risk, trading_style: style, time_range: timeRange, use_news: useNews, use_indicators: useIndicators, indicators })
+                });
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Unknown error');
+                }
+                const data = await response.json();
+
+                currentStrategy = data.strategy;
+                document.getElementById('strategy').classList.remove('hidden');
+                document.getElementById('strategy-text').innerHTML = marked.parse(data.strategy);
+                document.getElementById('chat-input-section').classList.remove('hidden');
+                const chatDiv = document.getElementById('chat-messages');
+                chatDiv.innerHTML = `
+                    <div class="chat-message-ai">
+                        <div class="chat-bubble-ai"><strong>PropBot:</strong> Hey there! I've generated your strategy. What do you want to know about it?</div>
+                    </div>`;
+            } catch (error) {
+                alert(`Error: ${error.message}`);
+            } finally {
+                btn.disabled = false;
+                btnText.classList.remove('hidden');
+                spinner.style.display = 'none';
+            }
+        }
+
+        async function chat() {
+            const input = document.getElementById('chatInput');
+            const btn = document.getElementById('chatBtn');
+            if (!input.value || btn.disabled) return;
+
+            btn.disabled = true;
+            const question = input.value;
+
+            try {
+                const response = await fetch('http://localhost:5000/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ strategy: currentStrategy, question })
+                });
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Unknown chat error');
+                }
+                const data = await response.json();
+
+                const chatDiv = document.getElementById('chat-messages');
+                chatDiv.innerHTML += `
+                    <div class="chat-message-user">
+                        <div class="chat-bubble-user"><strong>You:</strong> ${question}</div>
+                    </div>
+                    <div class="chat-message-ai">
+                        <div class="chat-bubble-ai"><strong>PropBot:</strong> ${marked.parse(data.response)}</div>
+                    </div>`;
+                chatDiv.scrollTop = chatDiv.scrollHeight;
+            } catch (error) {
+                alert(`Chat error: ${error.message}`);
+            } finally {
+                btn.disabled = false;
+                input.value = '';
+            }
+        }
+    </script>
+</body>
+</html>
