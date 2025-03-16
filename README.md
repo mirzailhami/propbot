@@ -1,4 +1,5 @@
 
+
 # 4h XAUUSD Prop Firm AI Strategy Generator
 
   
@@ -75,9 +76,9 @@ bedrock = boto3.client('bedrock-runtime', region_name='<region>')
 ```
 
 ## Run the app
-Backend: ```python3 app.py```
-Frontend: ```python3 -m http.server 8000```
+- Backend: ```python3 app.py```
+- Frontend: ```python3 -m http.server 8000```
 
 ## Verification
-Backend: http://localhost:5000
-Frontend: http://localhost:8000
+- Backend: http://localhost:5000
+- Frontend: http://localhost:8000
