@@ -73,3 +73,11 @@ bedrock = boto3.client('bedrock-runtime', region_name='<region>')
 ```
 `modelId="arn:aws:bedrock:<region>:<aws-account-id>:inference-profile/us.meta.llama3-3-70b-instruct-v1:0"`
 ```
+
+## Run the app
+Backend: ```python3 app.py```
+Frontend: ```python3 -m http.server 8000```
+
+## Verification
+Backend: http://localhost:5000
+Frontend: http://localhost:8000

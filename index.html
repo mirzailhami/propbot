@@ -3,17 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XAUUSD 4h Prop Firm Compliant AI Strategy Generator</title>
+    <title>XAUUSD Prop Firm AI Strategy Generator</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
         .spinner { display: none; }
         #indicatorsSection { display: block; }
-        #strategy-text { background: #f9fafb; padding: 1rem; border-radius: 0.375rem; }
         #chat-messages { 
-            max-height: 200px; 
+            max-height: 400px; 
             overflow-y: auto; 
             margin-top: 1rem; 
+            padding: 10px; 
+            background: #f9fafb; 
+            border-radius: 0.375rem; 
         }
         #chat-input-section { 
             position: sticky; 
@@ -26,31 +28,26 @@
             border-radius: 15px; 
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
         }
-        .chat-message-user { 
-            margin: 8px 0; 
-            text-align: left; 
+        .chat-message-user, .chat-message-ai { 
+            margin: 12px 0; 
         }
-        .chat-message-ai { 
-            margin: 8px 0; 
-            text-align: right; 
+        .chat-message-user { text-align: left; }
+        .chat-message-ai { text-align: right; }
+        .chat-bubble-user, .chat-bubble-ai { 
+            padding: 12px 18px; 
+            border-radius: 15px; 
+            display: inline-block; 
+            max-width: 80%; 
+            word-wrap: break-word; 
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
         }
         .chat-bubble-user { 
             background: #e5e7eb; 
-            padding: 10px 15px; 
-            border-radius: 15px; 
-            display: inline-block; 
-            max-width: 70%; 
-            word-wrap: break-word; 
         }
         .chat-bubble-ai { 
-        text-align: left;
+            text-align: left;
             background: #3b82f6; 
             color: white; 
-            padding: 10px 15px; 
-            border-radius: 15px; 
-            display: inline-block; 
-            max-width: 70%; 
-            word-wrap: break-word; 
         }
         #chatBtn { 
             padding: 0; 
@@ -61,11 +58,28 @@
             justify-content: center; 
             border-radius: 50%; 
         }
+        #chatInputContainer { 
+            position: relative; 
+            width: 100%; 
+        }
+        #chatInput { 
+            width: 100%; 
+            padding-right: 40px; /* Space for spinner */
+        }
+        #chatInputSpinner { 
+            position: absolute; 
+            right: 10px; 
+            top: 50%; 
+            transform: translateY(-50%); 
+            display: none; 
+            width: 20px; 
+            height: 20px; 
+        }
     </style>
 </head>
 <body class="bg-gray-100 font-sans">
     <div class="container mx-auto p-6 max-w-5xl">
-        <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">XAUUSD 4h Prop Firm Compliant AI Strategy Generator</h1>
+        <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">XAUUSD Prop Firm AI Strategy Generator</h1>
 
         <!-- Form -->
         <div class="bg-white p-6 rounded-lg shadow-md mb-6">
@@ -153,13 +167,18 @@
             </button>
         </div>
 
-        <!-- Strategy Output with Integrated Chat -->
+        <!-- Strategy and Chat in One Container -->
         <div id="strategy" class="bg-white p-6 rounded-lg shadow-md mb-6 hidden">
-            <h2 class="text-xl font-semibold text-gray-800 mb-4">Generated Strategy</h2>
-            <div id="strategy-text" class="text-gray-700"></div>
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Generated Strategy & Chat</h2>
             <div id="chat-messages"></div>
             <div id="chat-input-section" class="hidden">
-                <input id="chatInput" type="text" placeholder="Ask me anything about the strategy..." class="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" onkeypress="if(event.key === 'Enter') chat()">
+                <div id="chatInputContainer">
+                    <input id="chatInput" type="text" placeholder="Ask me anything about the strategy..." class="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <svg id="chatInputSpinner" class="animate-spin text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </div>
                 <button id="chatBtn" onclick="chat()" class="bg-blue-600 text-white hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
@@ -217,13 +236,13 @@
 
                 currentStrategy = data.strategy;
                 document.getElementById('strategy').classList.remove('hidden');
-                document.getElementById('strategy-text').innerHTML = marked.parse(data.strategy);
                 document.getElementById('chat-input-section').classList.remove('hidden');
                 const chatDiv = document.getElementById('chat-messages');
                 chatDiv.innerHTML = `
                     <div class="chat-message-ai">
-                        <div class="chat-bubble-ai"><strong>PropBot:</strong> Hey there! I've generated your strategy. What do you want to know about it?</div>
+                        <div class="chat-bubble-ai"><strong>PropBot:</strong> Here’s your generated strategy:<br>${marked.parse(data.strategy)}</div>
                     </div>`;
+                chatDiv.scrollTop = chatDiv.scrollHeight;
             } catch (error) {
                 alert(`Error: ${error.message}`);
             } finally {
@@ -236,10 +255,20 @@
         async function chat() {
             const input = document.getElementById('chatInput');
             const btn = document.getElementById('chatBtn');
+            const spinner = document.getElementById('chatInputSpinner');
             if (!input.value || btn.disabled) return;
 
             btn.disabled = true;
+            input.disabled = true;
+            spinner.style.display = 'block';
             const question = input.value;
+
+            const chatDiv = document.getElementById('chat-messages');
+            chatDiv.innerHTML += `
+                <div class="chat-message-user">
+                    <div class="chat-bubble-user"><strong>You:</strong> ${question}</div>
+                </div>`;
+            chatDiv.scrollTop = chatDiv.scrollHeight;
 
             try {
                 const response = await fetch('http://localhost:5000/chat', {
@@ -253,11 +282,7 @@
                 }
                 const data = await response.json();
 
-                const chatDiv = document.getElementById('chat-messages');
                 chatDiv.innerHTML += `
-                    <div class="chat-message-user">
-                        <div class="chat-bubble-user"><strong>You:</strong> ${question}</div>
-                    </div>
                     <div class="chat-message-ai">
                         <div class="chat-bubble-ai"><strong>PropBot:</strong> ${marked.parse(data.response)}</div>
                     </div>`;
@@ -266,6 +291,8 @@
                 alert(`Chat error: ${error.message}`);
             } finally {
                 btn.disabled = false;
+                input.disabled = false;
+                spinner.style.display = 'none';
                 input.value = '';
             }
         }
