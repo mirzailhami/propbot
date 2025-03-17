@@ -119,15 +119,15 @@ It should looks like this:
 
 ```
 
-bedrock = boto3.client('bedrock-runtime', region_name='<region>')
+bedrock = boto3.client('bedrock-runtime', region_name='us-east-1')
 
 ```
 
-  
+As well as for the modelId you are using:
 
 ```
 
-`modelId="arn:aws:bedrock:<region>:<aws-account-id>:inference-profile/us.meta.llama3-3-70b-instruct-v1:0"`
+modelId="arn:aws:bedrock:<region>:<aws-account-id>:inference-profile/us.meta.llama3-3-70b-instruct-v1:0"
 
 ```
 
