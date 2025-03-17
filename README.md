@@ -146,9 +146,5 @@ Note:
 
 - Backend: http://localhost:5000
 - Frontend: http://localhost:8000
-
-  
-
-## Code Repository
-
-- https://github.com/mirzailhami/propbot
+- Repository: https://github.com/mirzailhami/propbot
+- Video demo: https://monosnap.com/file/24NDh3hZ7FONeEnfYCJoHSDb2ufWJN
